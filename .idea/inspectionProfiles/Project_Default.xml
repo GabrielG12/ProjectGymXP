@@ -1,0 +1,58 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="1">
+            <item index="0" class="java.lang.String" itemvalue="draggable" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PyInterpreterInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="19">
+            <item index="0" class="java.lang.String" itemvalue="phonenumbers" />
+            <item index="1" class="java.lang.String" itemvalue="six" />
+            <item index="2" class="java.lang.String" itemvalue="bleach" />
+            <item index="3" class="java.lang.String" itemvalue="packaging" />
+            <item index="4" class="java.lang.String" itemvalue="pyparsing" />
+            <item index="5" class="java.lang.String" itemvalue="webencodings" />
+            <item index="6" class="java.lang.String" itemvalue="drf-api-logger" />
+            <item index="7" class="java.lang.String" itemvalue="ciscoisesdk" />
+            <item index="8" class="java.lang.String" itemvalue="netmiko" />
+            <item index="9" class="java.lang.String" itemvalue="scp" />
+            <item index="10" class="java.lang.String" itemvalue="future" />
+            <item index="11" class="java.lang.String" itemvalue="tenacity" />
+            <item index="12" class="java.lang.String" itemvalue="pyserial" />
+            <item index="13" class="java.lang.String" itemvalue="ntc-templates" />
+            <item index="14" class="java.lang.String" itemvalue="textfsm" />
+            <item index="15" class="java.lang.String" itemvalue="vconnector" />
+            <item index="16" class="java.lang.String" itemvalue="docopt" />
+            <item index="17" class="java.lang.String" itemvalue="tabulate" />
+            <item index="18" class="java.lang.String" itemvalue="pyvmomi" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N806" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="orkestrator.views.get_state_on_network" />
+          <option value="exercises.serializers.rest_frameworkimport" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
