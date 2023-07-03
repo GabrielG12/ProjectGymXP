@@ -1,0 +1,24 @@
+======================================================================================================================================================================================
+======================================================================================================================================================================================
+
+REGISTER AND LOGIN VIEWS:
+
+http://127.0.0.1:8000/auth/signup/		-> S pomočjo POST metode in vnosom pravilnega uporabniškega imena in gesla se uporabnik registrira
+
+http://127.0.0.1:8000/auth/login/		-> S pomočjo POST metode in vnosom pravilnega uporabniškega imena in gesla se uporabnik logira, ob tem dobi access token, ki ga uporablja
+										   naprej pri avtorizaciji.
+
+http://127.0.0.1:8000/auth/jwt/create/		-> S pomočjo POST metode in vnosom pravilnega uporabniškega imena in gesla si uporabnik ustvari nov access in refresh token
+
+http://127.0.0.1:8000/auth/jwt/refresh/		-> S pomočjo POST metode in vnosom pravilnega refresh tokena si uporabnik ponovno ustvari access token
+
+http://127.0.0.1:8000/auth/jwt/refresh/		-> S pomočjo POST metode in vnosom pravilnega access si uporabnik potrdi veljavnost access tokena
+
+======================================================================================================================================================================================
+======================================================================================================================================================================================
+
+USER VIEWS:
+
+
+http://127.0.0.1:8000/exercises/<str:name>/		-> IZVEDE GET, PUT, DELETE metode cez to vajo
+
