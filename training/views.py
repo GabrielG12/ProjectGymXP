@@ -1,33 +1,27 @@
 from rest_framework import status, viewsets, exceptions
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, DjangoModelPermissions
-from .models import Exercises
-from exercises.serializers import ExercisesCreateSerializer, ExercisesUserListSerializer, \
-    ExercisesDestroySerializer, ExercisesUpdateSerializer
+from .models import Training
+from .serializers import TrainingCreateSerializer, TrainingUserListSerializer, TrainingDestroySerializer, TrainingUserUpdateSerializer
 from rest_framework import generics, mixins, permissions, serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from .permissions import IsExerciseOwner
+#from .permissions import IsExerciseOwner
 from django.http import Http404
+from accounts.models import User
+from .permissions import IsTrainingOwner
 
 
-#TODO: VIEW FOR CREATING AN EXERCISE
-class ExercisesCreateView(CreateAPIView):
-
-    serializer_class = ExercisesCreateSerializer
-    queryset = Exercises.objects.all()
+#TODO: VIEW FOR CREATING A TRAINING
+class TrainingCreateView(CreateAPIView):
+    serializer_class = TrainingCreateSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         user = self.request.user
-        name = serializer.validated_data['name']
-        existing_exercise = Exercises.objects.filter(username=user, name=name).exists()
-        if existing_exercise:
-            raise serializers.ValidationError("Exercise with the same name already exists!")
         serializer.save(username=user)
-        return super().perform_create(serializer)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -38,20 +32,20 @@ class ExercisesCreateView(CreateAPIView):
             "Status": "201 Created",
             "Data": serializer.data
         }
-        return Response(data)
+        return Response(data, status=status.HTTP_201_CREATED)
 
 
-#TODO: VIEW FOR LISTING ALL USER EXERCISES
+#TODO: VIEW FOR LISTING ALL USER TRAININGS
 
-class ExercisesUserListView(ListAPIView):
-    serializer_class = ExercisesUserListSerializer
+class TrainingUserListView(ListAPIView):
+    serializer_class = TrainingUserListSerializer
     permission_classes = [IsAuthenticated]
 
-    #Pogledamo če je uporabnik avtoriziran za dostop do objekta!
     def get_queryset(self):
         username = self.kwargs['username']
+        user = User.objects.get(username=username)
         if self.request.user.is_authenticated and self.request.user.username == username:
-            return Exercises.objects.filter(username=username)
+            return Training.objects.filter(username=user)
         else:
             raise exceptions.PermissionDenied
 
@@ -66,46 +60,40 @@ class ExercisesUserListView(ListAPIView):
             )
         if not queryset.exists():
             data = {
-                "Message": "You do not have any exercises yet!",
+                "Message": "You do not have any trainings yet!",
                 "Status": "200 OK"
             }
             return Response(data, status=status.HTTP_200_OK)
 
         serializer = self.get_serializer(queryset, many=True)
         data = {
-            "Message": "These are the exercises for user {}!".format(self.kwargs['username']),
+            "Message": "These are the trainings for user {}!".format(self.kwargs['username']),
             "Status": "200 OK",
             "Data": serializer.data,
         }
         return Response(data, status=200)
 
 
-#TODO: VIEW FOR DESTROYING SPECIFIC USER EXERCISE
+#TODO: VIEW FOR DELETING SPECIFIC USER EXERCISE
 
-class ExercisesUserDestroyView(DestroyAPIView):
-    serializer_class = ExercisesDestroySerializer
+class TrainingUserDestroyView(DestroyAPIView):
+    serializer_class = TrainingDestroySerializer
     permission_classes = [IsAuthenticated]
-    queryset = Exercises.objects.all()
+    queryset = Training.objects.all()
 
-    # Pogledamo če je uporabnik avtoriziran za dostop do objekta!
-    def get_queryset(self):
+    def get_object(self):
         username = self.kwargs['username']
-        name = self.kwargs['name']
+        id = self.kwargs['id']
         if self.request.user.is_authenticated and self.request.user.username == username:
-            return Exercises.objects.filter(username=username, name=name)
+            try:
+                return Training.objects.get(username__username=username, id=id)
+            except Training.DoesNotExist:
+                raise exceptions.NotFound("Exercise not found.")
         else:
-            raise exceptions.PermissionDenied
+            raise exceptions.PermissionDenied("You are unauthorized to delete this exercise!")
 
     def destroy(self, request, *args, **kwargs):
-        try:
-            queryset = self.get_queryset()
-        except exceptions.PermissionDenied:
-            return Response(
-                {"Message": "You are unauthorized for accessing this object!",
-                 "Status": "403 Forbidden"},
-                status=403
-            )
-        instance = queryset
+        instance = self.get_object()
         self.perform_destroy(instance)
         data = {
             "Message": "The exercise was deleted!",
@@ -114,28 +102,30 @@ class ExercisesUserDestroyView(DestroyAPIView):
         return Response(data)
 
 
-#TODO: VIEW FOR UPDATING SPECIFIC USER EXERCISE
+#TODO: VIEW FOR DELETING SPECIFIC USER EXERCISE
 
 
-class ExercisesUserUpdateView(UpdateAPIView):
-    serializer_class = ExercisesUpdateSerializer
-    permission_classes = [IsAuthenticated, IsExerciseOwner]
+class TrainingUserUpdateView(UpdateAPIView):
+    serializer_class = TrainingUserUpdateSerializer
+    permission_classes = [IsAuthenticated, IsTrainingOwner]
 
     def get_object(self):
         username = self.kwargs['username']
-        name = self.kwargs['name']
-        try:
-            exercise = Exercises.objects.get(username=username, name=name)
-        except Exercises.DoesNotExist:
-            raise Http404("Exercise not found!")
-        return exercise
+        id = self.kwargs['id']
+        if self.request.user.is_authenticated and self.request.user.username == username:
+            try:
+                return Training.objects.get(username__username=username, id=id)
+            except Training.DoesNotExist:
+                raise exceptions.NotFound("Exercise not found.")
+        else:
+            raise exceptions.PermissionDenied("You are unauthorized to update this exercise!")
 
     def partial_update(self, request, *args, **kwargs):
-        exercise = self.get_object()
-        if not self.request.user.is_authenticated or not self.request.user == exercise.username:
+        training = self.get_object()
+        if not self.request.user.is_authenticated or not self.request.user == training.username:
             raise PermissionDenied("You are unauthorized to update this exercise!")
 
-        serializer = self.get_serializer(exercise, data=request.data, partial=True)
+        serializer = self.get_serializer(training, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save(username=request.user)
 
@@ -145,6 +135,5 @@ class ExercisesUserUpdateView(UpdateAPIView):
             "Data": serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
-
 
 
