@@ -13,23 +13,23 @@ class ExercisesCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Exercises
-        fields = ['name', 'type', 'username']
+        fields = ['name', 'exercise_type', 'username']
 
     def create(self, validated_data):
         username = validated_data['user']['username']
         user = User.objects.get(username=username)
         if user != self.context['request'].user:
             raise UnauthorizedException()
-        type = validated_data['type']
+        exercise_type = validated_data['exercise_type']
         name = validated_data['name']
-        exercise = Exercises.objects.create(username=user, name=name, type=type)
+        exercise = Exercises.objects.create(username=user, name=name, exercise_type=exercise_type)
         return exercise
 
 
 class ExercisesUserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exercises
-        fields = ['id', 'name', 'type', 'username']
+        fields = ['id', 'name', 'exercise_type', 'username']
 
 
 class ExercisesDestroySerializer(serializers.ModelSerializer):
@@ -41,4 +41,4 @@ class ExercisesDestroySerializer(serializers.ModelSerializer):
 class ExercisesUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exercises
-        fields = ['name', 'type', 'username']
+        fields = ['name', 'exercise_type', 'username']

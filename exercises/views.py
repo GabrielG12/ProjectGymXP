@@ -5,12 +5,13 @@ from exercises.serializers import ExercisesCreateSerializer, ExercisesUserListSe
     ExercisesDestroySerializer, ExercisesUpdateSerializer
 from rest_framework import generics, mixins, permissions, serializers
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from .permissions import IsExerciseOwner
 from django.http import Http404
+
 
 
 #TODO: VIEW FOR CREATING AN EXERCISE
@@ -117,9 +118,10 @@ class ExercisesUserDestroyView(DestroyAPIView):
 #TODO: VIEW FOR UPDATING SPECIFIC USER EXERCISE
 
 
-class ExercisesUserUpdateView(UpdateAPIView):
+class ExercisesUserRetrieveUpdateView(RetrieveUpdateAPIView):
     serializer_class = ExercisesUpdateSerializer
     permission_classes = [IsAuthenticated, IsExerciseOwner]
+
 
     def get_object(self):
         username = self.kwargs['username']

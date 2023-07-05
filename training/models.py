@@ -17,7 +17,7 @@ class Training(models.Model):
 
     exercise = models.ForeignKey(Exercises, on_delete=models.CASCADE)
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    quantity_type = models.CharField(max_length=30, choices=TYPE_CHOICES, default=SETS)
     quantity = models.PositiveIntegerField()
     date = models.DateField(auto_now_add=True)
 

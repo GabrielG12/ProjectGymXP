@@ -1,17 +1,14 @@
-from rest_framework import status, viewsets, exceptions
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, DjangoModelPermissions
+from rest_framework import status, exceptions
+from rest_framework.permissions import IsAuthenticated
 from .models import Training
-from .serializers import TrainingCreateSerializer, TrainingUserListSerializer, TrainingDestroySerializer, TrainingUserUpdateSerializer
-from rest_framework import generics, mixins, permissions, serializers
+from .serializers import TrainingCreateSerializer, TrainingUserListSerializer, TrainingDestroySerializer, \
+    TrainingUserUpdateSerializer, TrainingUserRetrieveSerializer
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
-#from .permissions import IsExerciseOwner
-from django.http import Http404
 from accounts.models import User
 from .permissions import IsTrainingOwner
+from django.shortcuts import get_object_or_404
 
 
 #TODO: VIEW FOR CREATING A TRAINING
@@ -69,6 +66,46 @@ class TrainingUserListView(ListAPIView):
         data = {
             "Message": "These are the trainings for user {}!".format(self.kwargs['username']),
             "Status": "200 OK",
+            "Data": serializer.data,
+        }
+        return Response(data, status=200)
+
+
+#TODO: VIEW FOR RETRIEVING SPECIFIC USER EXERCISE
+
+class TrainingUserRetrieveView(ListAPIView):
+    serializer_class = TrainingUserRetrieveSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        user = User.objects.get(username=username)
+        date = self.kwargs['date']
+        if self.request.user.is_authenticated and self.request.user.username == username:
+            return Training.objects.filter(username=user, date=date)
+        else:
+            raise exceptions.PermissionDenied
+
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+        except exceptions.PermissionDenied:
+            return Response(
+                {"Message": "You are unauthorized for accessing this object!",
+                 "Status": "403 Forbidden"},
+                status=403
+            )
+        if not queryset.exists():
+            data = {
+                "Message": "You did not do any trainings on this day!",
+                "Status": "204 No content"
+            }
+            return Response(data, status=status.HTTP_204_NO_CONTENT)
+
+        serializer = self.get_serializer(queryset, many=True)
+        data = {
+            "Status": "200 OK",
+            "Message": "These are the trainings for user {} on {}!".format(self.kwargs['username'], self.kwargs['date']),
             "Data": serializer.data,
         }
         return Response(data, status=200)
