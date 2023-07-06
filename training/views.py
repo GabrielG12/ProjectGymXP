@@ -1,4 +1,4 @@
-from rest_framework import status, exceptions
+from rest_framework import status, exceptions, filters
 from rest_framework.permissions import IsAuthenticated
 from .models import Training
 from .serializers import TrainingCreateSerializer, TrainingUserListSerializer, TrainingDestroySerializer, \

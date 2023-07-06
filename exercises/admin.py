@@ -5,8 +5,9 @@ from .models import Exercises
 @admin.register(Exercises)
 #TODO: TUKAJ POVEMO KAJ LAHKO ADMIN VIDI
 class ExercisesAdmin(admin.ModelAdmin):
-    list_display = ('name', 'exercise_type', 'username')
+    list_display = ('username', 'name', 'exercise_type')
     search_fields = ['name']
+    list_filter = ['username', 'name', 'exercise_type']
 
     def has_add_permission(self, request):
         return True
