@@ -1,17 +1,13 @@
-from rest_framework import status, viewsets, exceptions
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, DjangoModelPermissions
+from rest_framework import status, exceptions
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Exercises
 from exercises.serializers import ExercisesCreateSerializer, ExercisesUserListSerializer, \
     ExercisesDestroySerializer, ExercisesUpdateSerializer
-from rest_framework import generics, mixins, permissions, serializers
+from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.shortcuts import get_object_or_404
-from .permissions import IsExerciseOwner
 from django.http import Http404
-
 
 
 #TODO: VIEW FOR CREATING AN EXERCISE
@@ -46,12 +42,12 @@ class ExercisesCreateView(CreateAPIView):
 
 class ExercisesUserListView(ListAPIView):
     serializer_class = ExercisesUserListSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated | IsAdminUser]
 
     #Pogledamo če je uporabnik avtoriziran za dostop do objekta!
     def get_queryset(self):
         username = self.kwargs['username']
-        if self.request.user.is_authenticated and self.request.user.username == username:
+        if self.request.user.is_authenticated and (self.request.user.username == username or self.request.user.is_staff):
             return Exercises.objects.filter(username=username)
         else:
             raise exceptions.PermissionDenied
@@ -85,14 +81,14 @@ class ExercisesUserListView(ListAPIView):
 
 class ExercisesUserDestroyView(DestroyAPIView):
     serializer_class = ExercisesDestroySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated | IsAdminUser]
     queryset = Exercises.objects.all()
 
     # Pogledamo če je uporabnik avtoriziran za dostop do objekta!
     def get_queryset(self):
         username = self.kwargs['username']
         name = self.kwargs['name']
-        if self.request.user.is_authenticated and self.request.user.username == username:
+        if self.request.user.is_authenticated and (self.request.user.username == username or self.request.user.is_staff):
             return Exercises.objects.filter(username=username, name=name)
         else:
             raise exceptions.PermissionDenied
@@ -118,10 +114,9 @@ class ExercisesUserDestroyView(DestroyAPIView):
 #TODO: VIEW FOR UPDATING SPECIFIC USER EXERCISE
 
 
-class ExercisesUserRetrieveUpdateView(RetrieveUpdateAPIView):
+class ExercisesUserRetrieveUpdateView(UpdateAPIView):
     serializer_class = ExercisesUpdateSerializer
-    permission_classes = [IsAuthenticated, IsExerciseOwner]
-
+    permission_classes = [IsAuthenticated | IsAdminUser]
 
     def get_object(self):
         username = self.kwargs['username']
@@ -130,16 +125,27 @@ class ExercisesUserRetrieveUpdateView(RetrieveUpdateAPIView):
             exercise = Exercises.objects.get(username=username, name=name)
         except Exercises.DoesNotExist:
             raise Http404("Exercise not found!")
+
+        if (
+            not self.request.user.is_authenticated
+            or (self.request.user.username != username and not self.request.user.is_staff)
+        ):
+            raise PermissionDenied({"Message": "You are unauthorized to update this exercise!", "Status": "403 Forbidden"})
+
         return exercise
 
     def partial_update(self, request, *args, **kwargs):
         exercise = self.get_object()
-        if not self.request.user.is_authenticated or not self.request.user == exercise.username:
-            raise PermissionDenied("You are unauthorized to update this exercise!")
+        if not self.request.user.is_staff:
+            # If the user is not an admin, exclude the 'username' field from the update
+            update_data = request.data.copy()
+            update_data.pop('username', None)  # Remove the 'username' field from the update data
+            serializer = self.get_serializer(exercise, data=update_data, partial=True)
+        else:
+            serializer = self.get_serializer(exercise, data=request.data, partial=True)
 
-        serializer = self.get_serializer(exercise, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save(username=request.user)
+        serializer.save()
 
         data = {
             "Message": "The exercise was updated!",
@@ -147,6 +153,4 @@ class ExercisesUserRetrieveUpdateView(RetrieveUpdateAPIView):
             "Data": serializer.data
         }
         return Response(data, status=status.HTTP_200_OK)
-
-
 

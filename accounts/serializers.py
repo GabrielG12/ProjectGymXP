@@ -38,6 +38,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 class CurrentUserExercisesSerializer(serializers.ModelSerializer):
 
     exercises = serializers.StringRelatedField(many=True)
+
     class Meta:
         model = User
         fields = ['id', 'username', 'exercises']

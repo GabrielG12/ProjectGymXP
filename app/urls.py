@@ -7,5 +7,3 @@ urlpatterns = [
     path('exercises/', include("exercises.urls")),
     path('training/', include("training.urls")),
 ]
-
-

@@ -3,7 +3,8 @@
 
 REGISTER AND LOGIN VIEWS:
 
-http://127.0.0.1:8000/auth/signup/		-> S pomočjo POST metode in vnosom pravilnega uporabniškega imena in gesla se uporabnik registrira
+
+http://127.0.0.1:8000/auth/signup/		-> S pomočjo POST metode in vnosom uporabniškega imena, emaila in gesla se uporabnik registrira
 
 http://127.0.0.1:8000/auth/login/		-> S pomočjo POST metode in vnosom pravilnega uporabniškega imena in gesla se uporabnik logira, ob tem dobi access token, ki ga uporablja
 										   naprej pri avtorizaciji.
@@ -12,13 +13,38 @@ http://127.0.0.1:8000/auth/jwt/create/		-> S pomočjo POST metode in vnosom prav
 
 http://127.0.0.1:8000/auth/jwt/refresh/		-> S pomočjo POST metode in vnosom pravilnega refresh tokena si uporabnik ponovno ustvari access token
 
-http://127.0.0.1:8000/auth/jwt/refresh/		-> S pomočjo POST metode in vnosom pravilnega access si uporabnik potrdi veljavnost access tokena
+http://127.0.0.1:8000/auth/jwt/refresh/		-> S pomočjo POST metode in vnosom pravilnega access tokena si uporabnik potrdi veljavnost le-tega
 
 ======================================================================================================================================================================================
 ======================================================================================================================================================================================
 
-USER VIEWS:
+EXERCISES VIEWS:
 
 
-http://127.0.0.1:8000/exercises/<str:name>/		-> IZVEDE GET, PUT, DELETE metode cez to vajo
+http://127.0.0.1:8000/exercises/create/		-> S pomočjo POST metode, si avtenticiran uporabnik ustvari svoje vaje 
+
+http://127.0.0.1:8000/exercises/<str:username>/		-> S pomočjo GET metode, samo avtenticiran/avtoriziran uporabnik lahko pogleda vse svoje ustvarjene vaje
+
+http://127.0.0.1:8000/exercises/delete/<str:username>/<str:name>/	-> S pomočjo DELETE metode, samo avtenticiran/avtoriziran uporabnik lahko izbriše svojo vajo 
+
+http://127.0.0.1:8000/exercises/update/<str:username>/<str:name>/	-> S pomočjo PATCH metode, samo avtenticiran/avtoriziran uporabnik lahko update-a svojo vajo
+
+======================================================================================================================================================================================
+======================================================================================================================================================================================
+
+TRAINING VIEWS:
+
+
+http://127.0.0.1:8000/training/create/		-> S pomočjo POST metode, si avtenticiran uporabnik ustvari svoje vaje 
+
+http://127.0.0.1:8000/training/<str:username>/		-> S pomočjo GET metode, samo avtenticiran/avtoriziran uporabnik lahko pogleda vse svoje treninge
+
+http://127.0.0.1:8000/training/<str:username>/<str:date>/		-> S pomočjo GET metode, samo avtenticiran/avtoriziran uporabnik lahko pogleda vse svoje treninge v določenem dnevu
+
+http://127.0.0.1:8000/training/delete/<str:username>/<int:id>/	-> S pomočjo DELETE metode, samo avtenticiran/avtoriziran uporabnik lahko izbriše svoj trening
+
+http://127.0.0.1:8000/training/update/<str:username>/<int:id>/	-> S pomočjo PATCH metode, samo avtenticiran/avtoriziran uporabnik lahko update-a svojo vajo
+
+======================================================================================================================================================================================
+======================================================================================================================================================================================
 

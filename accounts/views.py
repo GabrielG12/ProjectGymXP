@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from .serializers import SignUpSerializer
 from rest_framework import generics, status
 from rest_framework.request import Request
@@ -9,6 +8,7 @@ from .tokens import create_jwt_pair_for_user
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
 
 class SignUpView(generics.GenericAPIView):
 
@@ -29,8 +29,8 @@ class SignUpView(generics.GenericAPIView):
             return Response(data=response, status=status.HTTP_201_CREATED)
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LoginView(APIView):
 
+class LoginView(APIView):
     permission_classes = []
 
     def get(self, request: Request):

@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class Exercises(models.Model):
 
     types = (("Cardio", "Cardio"), ("Strength", "Strength"), ("Technique", "Technique"))

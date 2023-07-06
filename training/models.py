@@ -1,9 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
 from exercises.models import Exercises
 from django.core.exceptions import ValidationError
 from app import settings
-
 
 
 class Training(models.Model):
@@ -22,7 +20,7 @@ class Training(models.Model):
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.exercise.name} - {self.username.username}"
+        return f"Exercise {self.exercise.name} by {self.username.username}"
 
     def save(self, *args, **kwargs):
         if self.exercise.username != self.username:

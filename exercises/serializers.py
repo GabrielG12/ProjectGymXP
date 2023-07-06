@@ -1,12 +1,15 @@
-from rest_framework import serializers, status
+from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Exercises
 from rest_framework.exceptions import APIException
 
 User = get_user_model()
+
+
 class UnauthorizedException(APIException):
     status_code = 403
     default_detail = "You are not authorized to perform this action."
+
 
 class ExercisesCreateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')

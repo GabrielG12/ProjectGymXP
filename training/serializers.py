@@ -9,7 +9,7 @@ class TrainingCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Training
-        fields = ['id', 'exercise', 'quantity_type', 'username', 'quantity', 'date']
+        fields = ['id', 'exercise', 'quantity_type', 'quantity', 'username', 'date']
         read_only_fields = ['username', 'date']
 
     def to_internal_value(self, data):
@@ -55,8 +55,8 @@ class TrainingUserRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Training
-        fields = ['id', 'username', 'date', 'exercise']
-
+        fields = '__all__'
+        read_only = ['quantity_type', 'quantity']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
