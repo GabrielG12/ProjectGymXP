@@ -6,6 +6,7 @@ from .serializers import TrainingCreateSerializer, TrainingUserListSerializer, T
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
 from accounts.models import User
+from datetime import datetime, date
 
 
 #TODO: VIEW FOR CREATING A TRAINING
@@ -22,7 +23,7 @@ class TrainingCreateView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         data = {
-            "Message": "Exercise created successfully!",
+            "Message": "Training created successfully!",
             "Status": "201 Created",
             "Data": serializer.data
         }
@@ -75,9 +76,15 @@ class TrainingUserRetrieveView(ListAPIView):
     def get_queryset(self):
         username = self.kwargs['username']
         user = User.objects.get(username=username)
-        date = self.kwargs['date']
+        date_str = self.kwargs['date']
         if self.request.user.is_authenticated and (self.request.user.username == username or self.request.user.is_staff):
-            return Training.objects.filter(username=user, date=date)
+            today = date.today()
+            training_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            if training_date <= today:
+                return Training.objects.filter(username=user, date=training_date)
+            else:
+                raise exceptions.ValidationError({"Message": "You can only view trainings for the current day or past time!",
+                                                  "Status": "400 Bad request"})
         else:
             raise exceptions.PermissionDenied
 

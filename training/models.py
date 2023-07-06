@@ -17,6 +17,9 @@ class Training(models.Model):
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quantity_type = models.CharField(max_length=30, choices=TYPE_CHOICES, default=SETS)
     quantity = models.PositiveIntegerField()
+    time_type = models.CharField(max_length=30, choices=[('Seconds', 'Seconds'), ('Minutes', 'Minutes'), ('Hours', 'Hours')],
+                                 blank=True, null=True)
+    repetitions = models.IntegerField(blank=True, null=True)
     date = models.DateField(auto_now_add=True)
 
     def __str__(self):
