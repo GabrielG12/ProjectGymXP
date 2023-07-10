@@ -20,12 +20,12 @@ class SignUpView(generics.GenericAPIView):
         serializer = self.serializer_class(data=data)
         if User.objects.filter(username=data['username']).exists():
             # User with the same username already exists
-            response = {"message": "User with the same username already exists."}
+            response = {"Message": "User with the same username already exists.", "Status": "400 Bad request"}
             return Response(data=response, status=status.HTTP_400_BAD_REQUEST)
 
         if serializer.is_valid():
             serializer.save()
-            response = {"message": "User created successfully!", "data": serializer.data}
+            response = {"Message": "User created successfully!", "data": serializer.data}
             return Response(data=response, status=status.HTTP_201_CREATED)
         return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

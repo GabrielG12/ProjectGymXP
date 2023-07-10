@@ -20,12 +20,13 @@ class SignUpSerializer(serializers.ModelSerializer):
         username_exists = User.objects.filter(username=attrs['username']).exists()
         email_exists = User.objects.filter(email=attrs['email']).exists()
         if username_exists:
-            raise ValidationError("Username already exists. Try using new username!")
+            raise ValidationError({"Message": "Username already exists. Try using new username!", "Status": "400 Bad request"})
         if email_exists:
-            raise ValidationError("Email already exists. Try using new email!")
+            raise ValidationError({"Message": "Email already exists. Try using new email!", "Status": "400 Bad request"})
         return super().validate(attrs)
 
     #TODO: HASHIRAMO USERJA DA ADMIN NE VIDI PASSWORDA
+
     def create(self, validated_data):
         password = validated_data.pop("password")
         user = super().create(validated_data)
