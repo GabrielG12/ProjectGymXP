@@ -1,13 +1,15 @@
 from rest_framework import serializers
 from exercises.models import Exercises
 from .models import Training
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class TrainingCreateSerializer(serializers.ModelSerializer):
-    exercise = serializers.SlugRelatedField(queryset=Exercises.objects.all(), slug_field='name')
+    exercise = serializers.CharField()
     username = serializers.CharField()
     repetitions = serializers.IntegerField(required=False)
-    time_type = serializers.ChoiceField(choices=[('Seconds', 'Seconds'), ('Minutes', 'Minutes'), ('Hours', 'Hours')], required=False)
+    time_type = serializers.ChoiceField(choices=[('Seconds', 'Seconds'), ('Minutes', 'Minutes'), ('Hours', 'Hours')],
+                                        required=False)
 
     class Meta:
         model = Training
@@ -26,30 +28,26 @@ class TrainingCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        exercise_name = validated_data['exercise']
-        quantity = validated_data['quantity']
-        quantity_type = validated_data['quantity_type']
-        repetitions = validated_data.get('repetitions')
-        time_type = validated_data.get('time_type')
+        exercise = validated_data.pop('exercise')
         username = validated_data['username']
-        exercise = Exercises.objects.filter(name=exercise_name, username=username).first()
-        if exercise is None:
+
+        try:
+            exercise = Exercises.objects.get(name=exercise, username=username)
+        except Exercises.DoesNotExist:
             raise serializers.ValidationError("Exercise not found for the specified username.")
-        training_data = {
-            'username': username,
-            'exercise': exercise,
-            'quantity_type': quantity_type,
-            'quantity': quantity,
-        }
-        if quantity_type == 'Sets':
-            training_data['repetitions'] = repetitions
-        elif quantity_type == 'Time':
-            training_data['time_type'] = time_type
-        return Training.objects.create(**training_data)
+
+        validated_data['exercise'] = exercise
+        training = Training.objects.create(**validated_data)
+        return training
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['username'] = instance.username.username
+        representation = {
+            key: value
+            for key, value in representation.items()
+            if value is not None and value != ''
+        }
         return representation
 
 

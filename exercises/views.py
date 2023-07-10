@@ -22,7 +22,7 @@ class ExercisesCreateView(CreateAPIView):
         name = serializer.validated_data['name']
         existing_exercise = Exercises.objects.filter(username=user, name=name).exists()
         if existing_exercise:
-            raise serializers.ValidationError("Exercise with the same name already exists!")
+            raise serializers.ValidationError({"Message": "Exercise with this name already exists!", "Status": "400 Bad request"})
         serializer.save(username=user)
         return super().perform_create(serializer)
 
