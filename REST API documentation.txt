@@ -13,7 +13,7 @@ http://127.0.0.1:8000/auth/jwt/create/		-> S pomočjo POST metode in vnosom prav
 
 http://127.0.0.1:8000/auth/jwt/refresh/		-> S pomočjo POST metode in vnosom pravilnega refresh tokena si uporabnik ponovno ustvari access token
 
-http://127.0.0.1:8000/auth/jwt/refresh/		-> S pomočjo POST metode in vnosom pravilnega access tokena si uporabnik potrdi veljavnost le-tega
+http://127.0.0.1:8000/auth/jwt/verify/		-> S pomočjo POST metode in vnosom pravilnega access tokena si uporabnik potrdi veljavnost le-tega
 
 ======================================================================================================================================================================================
 ======================================================================================================================================================================================

@@ -126,7 +126,7 @@ class TrainingUserDestroyView(DestroyAPIView):
             try:
                 return Training.objects.get(username__username=username, id=id)
             except Training.DoesNotExist:
-                raise exceptions.NotFound("Exercise not found.")
+                raise exceptions.NotFound("Training not found.")
         else:
             raise exceptions.PermissionDenied({"Message": "You are unauthorized to delete this exercise!", "Status": "403 Forbidden"})
 
